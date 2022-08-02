@@ -9,7 +9,7 @@ async function gatherEndHTML(ticketChannel, interaction) {
 
     await ticketChannel.participants.forEach((key, value) => {
         interaction.guild.members.fetch(value).then((member) => {
-            const str = `<div class="member"><img class="list-pfp" src="${member.user.displayAvatarURL()}" alt="${member.user.username}"><span class="member-list-username" style="color: ${member.displayHexColor}">${member.nickname}</span></div>`
+            const str = `<div class="member"><img class="list-pfp" src="${member.user.displayAvatarURL()}" alt="${member.user.username}"><span class="member-list-username" style="color: ${member.displayHexColor}">${member.nickname ? null : member.user.username}</span></div>`
             html += str;
         })
     })

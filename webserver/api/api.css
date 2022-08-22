@@ -1,0 +1,26 @@
+.server-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.server-container {
+    display: flex;
+    width: 200px;
+}
+
+.server-container:hover {
+    background-color: #32353B;
+    border-radius: 15px;
+}
+
+.server-name {
+    margin-top: 30px;
+    font-weight: bold;
+}
+
+body {
+    background-color: rgb(54, 57, 63);
+    font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}

@@ -5,6 +5,7 @@ const { token, mongoCLI } = require('./config.json');
 const { createTicket } = require('./buttonPress');
 const mongoose = require('mongoose');
 const { stringTest } = require('./testFunction')
+const { app } = require("./webserver/api/app")
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 

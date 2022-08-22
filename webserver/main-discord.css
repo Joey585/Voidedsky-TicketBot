@@ -240,3 +240,23 @@ svg {
 #message-frame::-webkit-scrollbar-track {
     background-color: hsl(210,calc(var(--saturation-factor, 1)*9.8%),20%);
 }
+
+.half-message img {
+    margin-top: -10px;
+    width: 100%;
+    max-width: 300px;
+    max-height: 300px;
+    display: block;
+    aspect-ratio: 300 / 300;
+    margin-left: 70px;
+}
+
+.imageLink {
+    color: hsl(197,calc(var(--saturation-factor, 1)*100%),47.8%);
+    text-decoration: none;
+}
+
+.imageLink:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}

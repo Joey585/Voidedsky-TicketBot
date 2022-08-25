@@ -3,15 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>{User} Ticket Dashboard</title>
-    <link rel="stylesheet" href="api.css">
+    <style>
+        .server-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            padding: 10px;
+        }
+
+        .server-container {
+            display: flex;
+            width: 200px;
+        }
+
+        .server-container:hover {
+            background-color: #32353B;
+            border-radius: 15px;
+        }
+
+        .server-name {
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        body {
+            background-color: rgb(54, 57, 63);
+            font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        }
+
+        #server-frame {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
 <body>
+<h1 id="start_title">Servers for {user}</h1>
 
-<h1>Servers for {user}</h1>
-<div class="server-container">
-    <img class="server-icon" alt="server_name" src="https://cdn.discordapp.com/icons/823440909407485972/c630df466c1ab24d217c0007d8067b1e.webp?size=240">
-    <span class="server-name">The Basement</span>
+<div id="server-frame">
+
 </div>
-
+<script src="/socket.io/socket.io.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 var socket = io();
 
-socket.on("auth", (data) => {
+socket.once("auth", (data) => {
     const title = document.getElementById("start_title");
     title.innerHTML = `Servers for ${data.user.username}`
     document.title = `${data.user.username} Ticket Dashboard`

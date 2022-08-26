@@ -6,6 +6,10 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+const { PermissionsBitField, BitField} = require('discord.js');
+const bitFieldCalculator = require("discord-bitfield-calculator");
+
+
 
 const htmlPath = path.join(__dirname, "api")
 
@@ -14,7 +18,8 @@ app.use(express.static("."))
     app.get("/callback", async (req, res) => {
         const accessCode = req.query.code
 
-        console.log(accessCode)
+        let accessGuilds = []
+
         if(!accessCode) {
             return;
         }
@@ -54,12 +59,19 @@ app.use(express.static("."))
                 .then(response => {
                     console.log("Successful authentication made.")
                     getGuilds(data.access_token).then((guildData) => {
+                        guildData.forEach((guild) => {
+                            const permissions = bitFieldCalculator.permissions(guild.permissions);
+                            if(permissions.includes("BAN_MEMBERS")){
+                                accessGuilds.push(guild)
+                            }
+                        })
+
                         res.redirect(`/home.html?id=${response.data.id}`)
                         io.on("connection", async (socket) => {
                             socket.emit("auth", {
                                 user: response.data,
                                 access_token: data.access_token,
-                                guilds: guildData
+                                guilds: accessGuilds
                             })
                         })
                     })

@@ -4,7 +4,6 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token, mongoCLI } = require('./config.json');
 const { createTicket } = require('./buttonPress');
 const mongoose = require('mongoose');
-const { stringTest } = require('./testFunction')
 const { app } = require("./webserver/api/app")
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -34,8 +33,6 @@ for (const file of eventFiles) {
 
 client.once('ready', () => {
     console.log('Ready!');
-
-    stringTest("Hello there, <@620813044246642689>")
 });
 
 client.on('interactionCreate', async interaction => {

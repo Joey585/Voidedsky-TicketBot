@@ -84,8 +84,28 @@ app.use(express.static("."))
         })
 })
 
+
+app.get("/guild", (req, res) => {
+    if(!req.query.accessToken){
+        res.send("Unauthorized!")
+    }
+
+
+})
+
+
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
+        headers: {
+            authorization: `Bearer ${accessToken}`
+        }
+    }).then((res) => {
+        resolve(res.data)
+    }).catch((reject))
+})
+
+const getGuildInfo = (accessToken, guildID) => new Promise((resolve, reject) => {
+    axios.get(`http://discord.com/api/guilds/${guildID}`, {
         headers: {
             authorization: `Bearer ${accessToken}`
         }

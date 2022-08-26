@@ -22,6 +22,10 @@ socket.once("auth", (data) => {
 function createGuild(guild){
     const guildFrame = document.getElementById("server-frame")
 
+    const guildClick = document.createElement("a")
+    guildClick.style.textDecoration = "none";
+    guildClick.href = ``
+
     const guildElement = document.createElement("div")
     guildElement.classList.add("server-container");
     guildElement.style.display = "flex";

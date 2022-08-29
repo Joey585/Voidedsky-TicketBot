@@ -8,10 +8,8 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const { PermissionsBitField, BitField} = require('discord.js');
 const bitFieldCalculator = require("discord-bitfield-calculator");
+const {token} = require("../../config.json")
 
-
-
-const htmlPath = path.join(__dirname, "api")
 
 app.use(express.static("."))
 
@@ -66,7 +64,7 @@ app.use(express.static("."))
                             }
                         })
 
-                        res.redirect(`/home.html?id=${response.data.id}`)
+                        res.redirect(`/home.html`)
                         io.on("connection", async (socket) => {
                             socket.emit("auth", {
                                 user: response.data,
@@ -86,11 +84,19 @@ app.use(express.static("."))
 
 
 app.get("/guild", (req, res) => {
-    if(!req.query.accessToken){
-        res.send("Unauthorized!")
+    if(!req.query.id){
+        res.send("Bad Request")
     }
-
-
+    getGuildInfo(req.query.id).then((guild) => {
+        res.redirect("/guild.html")
+        io.on("connection", (socket) => {
+            socket.emit("guildLoad", guild)
+        })
+    }).catch((e) => {
+        if(e.response.status === 403){
+            res.redirect("/missing.html")
+        }
+    })
 })
 
 
@@ -104,10 +110,10 @@ const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     }).catch((reject))
 })
 
-const getGuildInfo = (accessToken, guildID) => new Promise((resolve, reject) => {
-    axios.get(`http://discord.com/api/guilds/${guildID}`, {
+const getGuildInfo = (guildID) => new Promise((resolve, reject) => {
+    axios.get(`https://discord.com/api/guilds/${guildID}`, {
         headers: {
-            authorization: `Bearer ${accessToken}`
+            authorization: `Bot ${token}`
         }
     }).then((res) => {
         resolve(res.data)

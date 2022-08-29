@@ -24,7 +24,9 @@ function createGuild(guild){
 
     const guildClick = document.createElement("a")
     guildClick.style.textDecoration = "none";
-    guildClick.href = ``
+    guildClick.href = `/guild?id=${guild.id}`
+    guildClick.style.textDecoration = "none"
+    guildClick.style.color = "black"
 
     const guildElement = document.createElement("div")
     guildElement.classList.add("server-container");
@@ -54,5 +56,6 @@ function createGuild(guild){
 
     guildElement.appendChild(guildImage)
     guildElement.appendChild(guildName)
-    guildFrame.appendChild(guildElement)
+    guildClick.appendChild(guildElement)
+    guildFrame.appendChild(guildClick)
 }

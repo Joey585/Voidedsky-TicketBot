@@ -1,0 +1,25 @@
+#server-frame{
+    display: flex;
+    right: 50%;
+    gap: 15px;
+}
+
+#server-frame img {
+    border-radius: 50%;
+}
+
+.server-name {
+    margin-top: 20px;
+    color: white;
+    font-weight: bold;
+    font-size: x-large;
+}
+
+hr {
+    color: black;
+}
+
+html {
+    background-color: rgb(54, 57, 63);
+    font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}

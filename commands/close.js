@@ -26,6 +26,7 @@ module.exports = {
                 .setDescription("reason for ticket closing")
         ),
     async execute(interaction){
+        console.log("running")
         if(!(interaction.channel.topic.startsWith("ticket ID:") && interaction.channel.name.startsWith("ticket-"))) {
             return interaction.reply("This is not a ticket channel!")
         }
@@ -39,10 +40,10 @@ module.exports = {
                 console.log(err)
             }
 
-
-
             await fs.appendFile(`./webserver/tickets/${interaction.channel.name}-${id}.html`, `${await gatherEndHTML(ticketChannel, interaction)}</div></body></html>`, (e) => { if(e) throw e; })
 
+            ticketChannel.delete();
+            interaction.channel.delete()
 
             if(!logChannel) {
                 return;
@@ -63,9 +64,6 @@ module.exports = {
                 )
 
             channel.send({embeds: [finishTicketEmbed]})
-
-            ticketChannel.delete();
-            interaction.channel.delete()
         })
 
 

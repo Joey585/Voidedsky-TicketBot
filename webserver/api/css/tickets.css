@@ -1,0 +1,40 @@
+.hover-stats {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted darkblue;
+}
+
+.hover-stats .stats {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 105%;
+}
+
+.hover-stats:hover .stats {
+    visibility: visible;
+}
+
+#ticket-frame {
+    display: flex;
+}
+
+.ticket {
+    color: gainsboro;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #32353B;
+}
+
+.ticket a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}

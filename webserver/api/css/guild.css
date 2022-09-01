@@ -23,3 +23,21 @@ html {
     background-color: rgb(54, 57, 63);
     font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
+
+#side-panel {
+    float: left;
+    padding: 15px;
+    border: 2px black solid;
+    margin-top: 5%;
+    display: flex;
+    width: 150px;
+    height: 100%;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.nav-button {
+    text-decoration: none;
+    color: #A0A3A7;
+    font-size: x-large;
+}

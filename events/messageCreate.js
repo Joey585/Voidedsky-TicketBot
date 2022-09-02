@@ -3,6 +3,8 @@ const { TicketChannel } = require("../buttonPress");
 const moment = require("moment");
 const { containsLink } = require("../util/containsLink");
 const isImageUrl = require("is-image-url");
+const guild = require("../util/guild")
+
 
 String.prototype.insert = function (index, string) {
     if(index > 0) {
@@ -142,6 +144,15 @@ module.exports = {
                 })
             }
         })
+
+
+        if(!await guild.guildInDB(message.guild.id)){
+            const newGuild = new guild.Guild({
+                id: message.guild.id,
+            })
+            newGuild.save();
+        }
+
 
 
     }

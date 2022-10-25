@@ -88,7 +88,7 @@ app.get("/guild", (req, res) => {
         res.send("Bad Request")
     }
     getGuildInfo(req.query.id).then((guild) => {
-        res.redirect("/guilds/guild.html")
+        res.redirect("/guilds/guild.html        ")
         io.on("connection", (socket) => {
             socket.emit("guildLoad", guild)
         })

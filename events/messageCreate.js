@@ -3,9 +3,11 @@ const { TicketChannel } = require("../buttonPress");
 const moment = require("moment");
 const { containsLink } = require("../util/containsLink");
 const isImageUrl = require("is-image-url");
-const guild = require("../util/guild")
+// const {Guild, guildInDB, guildSchema} = require("../util/guild");
 
 
+
+// custom string method to insert a string into a string
 String.prototype.insert = function (index, string) {
     if(index > 0) {
         return this.substring(0, index) + string + this.substr(index);
@@ -15,6 +17,7 @@ String.prototype.insert = function (index, string) {
 };
 
 
+// update the database the id of the last person who talked
 function updateLastTalked(doc, id){
     doc.updateOne({ lastTalked: id }, (e) => {
         if (e) console.log(e)
@@ -22,12 +25,14 @@ function updateLastTalked(doc, id){
     doc.save();
 }
 
-
+// parse the entire message, emojis, images, mentions, links, images
 function cleanMessage(message) {
 
     const mentionRegexp = new RegExp('<@\\d+>', 'g');
     const linkRegexp = new RegExp('(?:\\b[a-z\\d.-]+:\\/\\/[^<>\\s]+|\\b(?:(?:(?:[^\\s!@#$%^&*()_=+[\\]{}\\|;:\'",.<>/?]+)\\.)+(?:ac|ad|aero|ae|af|ag|ai|al|am|an|ao|aq|arpa|ar|asia|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|biz|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|cat|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|coop|com|co|cr|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|edu|ee|eg|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gov|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|info|int|in|io|iq|ir|is|it|je|jm|jobs|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mil|mk|ml|mm|mn|mobi|mo|mp|mq|mr|ms|mt|museum|mu|mv|mw|mx|my|mz|name|na|nc|net|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|org|pa|pe|pf|pg|ph|pk|pl|pm|pn|pro|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tel|tf|tg|th|tj|tk|tl|tm|tn|to|tp|travel|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|xn--0zwm56d|xn--11b5bs3a9aj6g|xn--80akhbyknj4f|xn--9t4b11yi5a|xn--deba0ad|xn--g6w251d|xn--hgbk6aj7f53bba|xn--hlcj6aya9esc7a|xn--jxalpdlp|xn--kgbechtv|xn--zckzah|ye|yt|yu|za|zm|zw)|(?:(?:[0-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.){3}(?:[0-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5]))(?:[;/][^#?<>\\s]*)?(?:\\?[^#<>\\s]*)?(?:#[^<>\\s]*)?(?!\\w))', 'g');
     const emojiRegexp = new RegExp('(<a?)?:\\w+:(\\d{18}>)?', "g");
+    const imgEmojiRegexp = new RegExp('<img class="emoji-small" src="https:\\/\\/cdn.discordapp.com\\/emojis\\/\\d{18,20}.webp\\?size=44&quality=lossless" alt="emoji">', 'g');
+    const htmlRegexp = new RegExp("(<script(\\s|\\S)*?<\\/script>)|(<style(\\s|\\S)*?<\\/style>)|(<!--(\\s|\\S)*?-->)|(<\\/?(\\s|\\S)*?>)", "g");
 
     let messageContent = message.content
 
@@ -38,25 +43,33 @@ function cleanMessage(message) {
 
         const username = message.mentions.members.get(match[0].replace(regex, "")).user.username;
 
-        messageContent = messageContent.replace(match[0], "")
-        messageContent = messageContent.insert(match.index, `<span class="mention">@${username}</span>`)
+        messageContent = messageContent.replace(match[0], `<span class="mention">@${username}</span>`)
     }
 
-    const emojiMatches = messageContent.matchAll(emojiRegexp);
-    for (const match of emojiMatches){
-        messageContent = messageContent.replace(match[0], "")
-        messageContent = messageContent.insert(match.index, `<img class="emoji-small" src="https://discord.com/">`)
 
-    }
 
     const linkMatches = messageContent.matchAll(linkRegexp);
     for (const match of linkMatches) {
-        messageContent = messageContent.replace(match[0], "")
-        messageContent = messageContent.insert(match.index, `<a class="imageLink" href="${match[0]}" target="_blank">${match[0]}</a>`)
+        messageContent = messageContent.replace(match[0], `<a class="imageLink" href="${match[0]}" target="_blank">${match[0]}</a>`)
         if(isImageUrl(match[0])){
             messageContent += `<div class="half-message"><img class="discordImage" src="${match[0]}" alt="${match[0]}"></div>`
         }
     }
+    const emojiMatches = messageContent.matchAll(emojiRegexp);
+    for (const match of emojiMatches){
+        const emojiId = match[0].replace("<:", "").split(":")[1].replace(">", "")
+
+        messageContent = messageContent.replace(match[0], `<img class="emoji-small" src="https://cdn.discordapp.com/emojis/${emojiId.replace(">", "")}.webp?size=44&quality=lossless" alt="emoji">`)
+        // messageContent = messageContent.insert(match.index, `<img class="emoji-small" src="https://cdn.discordapp.com/emojis/${emojiId}.webp?size=44&quality=lossless" alt="emoji">`)
+
+    }
+
+    const messageCheck = messageContent.replaceAll(/<img class="emoji-small" src="https:\/\/cdn.discordapp.com\/emojis\/\d{18,20}.webp\?size=44&quality=lossless" alt="emoji">/gi, "")
+    if(messageCheck.trim().length === 0){
+        messageContent = messageContent.replaceAll("emoji-small", "emoji-big").replaceAll("?size=44", "?size=96")
+    }
+
+    messageContent = messageContent.replaceAll(htmlRegexp, "");
 
     return messageContent
 }
@@ -125,9 +138,9 @@ module.exports = {
 
             if(ticketChannel.lastTalked === null) {
                 updateLastTalked(ticketChannel, message.author.id)
-                if(containsLink(message)){
-
-                }
+                // if(containsLink(message)){
+                //
+                // }
                 fullMessage(message, id, formattedTimestamp)
                 return;
             }
@@ -154,12 +167,12 @@ module.exports = {
         })
 
 
-        if(!await guild.guildInDB(message.guild.id)){
-            const newGuild = new guild.Guild({
-                id: message.guild.id,
-            })
-            newGuild.save();
-        }
+        // if(!await guildInDB(message.guild.id)){
+        //     const newGuild = new Guild({
+        //         id: message.guild.id,
+        //     })
+        //     await newGuild.save();
+        // }
 
 
 

@@ -105,18 +105,28 @@ app.get("/tickets", (req, res) => {
     if(!req.query.guildId){
         return res.send("Bad Request");
     }
-    getAllTickets(req.query.guildId).then((tickets) => {
-       res.redirect("/guilds/tickets.html");
-       io.on("connection", (socket) => {
-            socket.emit("ticketLoad", tickets);
-       })
+    let tickets = []
+    const ticketNameRegex = new RegExp("ticket-(\\w+)-(\\d+)", "gi")
+    Guild.findOne({id: req.query.guildId}, (err, guild) => {
+        guild.tickets.forEach((ticketName) => {
+            const matches = [...ticketName.matchAll(ticketNameRegex)];
+            const id = matches[0][2];
+            TicketChannel.findOne({id: id}, (err, ticketChannel) => {
+                console.log(`Adding to tickets, ${ticketName}`)
+                tickets.push(ticketChannel);
+            });
+        });
+        res.redirect("/guilds/tickets.html");
+        io.on("connection", (socket) => {
+           socket.emit("ticketLoad", tickets);
+        });
     });
 });
 
 app.get("/username", async (req, res) => {
     if(!req.query.id) return res.send("Bad Request");
     const user = await client.users.fetch(req.query.id);
-    return res.send(user.username);
+    return res.json({username: user.username, id: req.query.id, statusCode: 200, tag: user.tag, avatarLink: user.avatarURL()});
 });
 
 
@@ -141,19 +151,8 @@ const getGuildInfo = (guildID) => new Promise((resolve, reject) => {
 });
 
 const getAllTickets = (guildID) => new Promise((resolve, reject) => {
-    let tickets = new Map();
-    const ticketNameRegex = new RegExp("ticket-(\\w+)-(\\d+)", "gi")
-    Guild.findOne({id: guildID}, (err, guild) => {
-       guild.tickets.forEach((ticketName) => {
-           const matches = [...ticketName.matchAll(ticketNameRegex)];
-           const id = matches[0][2];
-           TicketChannel.findOne({id: id}, (err, ticketChannel) => {
-               console.log(`Adding to tickets, ${ticketName} ${ticketChannel}`)
-               tickets.set(ticketName, ticketChannel);
-           });
-       });
-    });
-    resolve(tickets);
+
+
 });
 
 

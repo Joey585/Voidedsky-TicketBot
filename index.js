@@ -4,7 +4,6 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token, mongoCLI } = require('./config.json');
 const { createTicket } = require('./buttonPress');
 const mongoose = require('mongoose');
-const { app } = require("./webserver/api/app")
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -59,3 +58,4 @@ async function main() {
 }
 
 client.login(token);
+module.exports = { client };

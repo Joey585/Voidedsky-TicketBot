@@ -1,9 +1,11 @@
 const fs = require("fs");
-const { TicketChannel } = require("../buttonPress");
+const { TicketChannel, ticketChannelSchema} = require("../buttonPress");
 const moment = require("moment");
 const { containsLink } = require("../util/containsLink");
 const isImageUrl = require("is-image-url");
-// const {Guild, guildInDB, guildSchema} = require("../util/guild");
+const {Schema} = require("mongoose");
+const mongoose = require("mongoose");
+const {Guild, guildSchema} = require("../buttonPress");
 
 
 
@@ -57,9 +59,10 @@ function cleanMessage(message) {
     }
     const emojiMatches = messageContent.matchAll(emojiRegexp);
     for (const match of emojiMatches){
-        const emojiId = match[0].replace("<:", "").split(":")[1].replace(">", "")
+        const emojiId = match[0].replace("<:", "").split(":")[1].replace(">", "");
 
         messageContent = messageContent.replace(match[0], `<img class="emoji-small" src="https://cdn.discordapp.com/emojis/${emojiId.replace(">", "")}.webp?size=44&quality=lossless" alt="emoji">`)
+        console.log(messageContent)
         // messageContent = messageContent.insert(match.index, `<img class="emoji-small" src="https://cdn.discordapp.com/emojis/${emojiId}.webp?size=44&quality=lossless" alt="emoji">`)
 
     }
@@ -69,7 +72,7 @@ function cleanMessage(message) {
         messageContent = messageContent.replaceAll("emoji-small", "emoji-big").replaceAll("?size=44", "?size=96")
     }
 
-    messageContent = messageContent.replaceAll(htmlRegexp, "");
+    // messageContent = messageContent.replaceAll(htmlRegexp, "");
 
     return messageContent
 }
@@ -164,15 +167,24 @@ module.exports = {
                     }
                 })
             }
-        })
+        });
 
 
-        // if(!await guildInDB(message.guild.id)){
-        //     const newGuild = new Guild({
-        //         id: message.guild.id,
-        //     })
-        //     await newGuild.save();
-        // }
+
+        Guild.findOne({id: message.guild.id}, (err, guild) => {
+           if(err) return;
+           if(guild) return;
+           else {
+               const newGuild = new Guild({
+                   id: message.guild.id,
+                   tickets: [],
+                   settings: {
+                       testSetting: false
+                   }
+               });
+               return newGuild.save();
+           }
+        });
 
 
 

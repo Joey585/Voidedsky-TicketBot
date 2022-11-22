@@ -42,7 +42,11 @@ module.exports = {
 
             await fs.appendFile(`./webserver/tickets/${interaction.channel.name}-${id}.html`, `${await gatherEndHTML(ticketChannel, interaction)}</div></body></html>`, (e) => { if(e) throw e; })
 
-            ticketChannel.delete();
+            ticketChannel.closed = true;
+            ticketChannel.reason = reason ? reason : "Not Stated."
+            ticketChannel.closeUserId = interaction.user.id
+            ticketChannel.save();
+
             interaction.channel.delete()
 
             if(!logChannel) {

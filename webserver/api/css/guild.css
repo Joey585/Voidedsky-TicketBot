@@ -24,16 +24,10 @@ html {
     font-family: Whitney, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
-#side-panel {
-    float: left;
-    padding: 15px;
-    border: 2px black solid;
-    margin-top: 5%;
+#navbar {
+    margin-left: 80%;
     display: flex;
-    width: 150px;
-    height: 100%;
-    flex-direction: column;
-    gap: 30px;
+    gap: 20px;
 }
 
 .nav-button {

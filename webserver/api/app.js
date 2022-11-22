@@ -9,11 +9,13 @@ const io = new Server(server);
 const { PermissionsBitField, BitField} = require('discord.js');
 const bitFieldCalculator = require("discord-bitfield-calculator");
 const {token} = require("../../config.json")
+const {Guild, TicketChannel} = require("../../buttonPress");
+const {client} = require("../../index");
 
 
-app.use(express.static("."))
+app.use(express.static(__dirname));
 
-    app.get("/callback", async (req, res) => {
+app.get("/callback", async (req, res) => {
         const accessCode = req.query.code
 
         let accessGuilds = []
@@ -88,7 +90,7 @@ app.get("/guild", (req, res) => {
         res.send("Bad Request")
     }
     getGuildInfo(req.query.id).then((guild) => {
-        res.redirect("/guilds/guild.html        ")
+        res.redirect("/guilds/guild.html")
         io.on("connection", (socket) => {
             socket.emit("guildLoad", guild)
         })
@@ -97,7 +99,25 @@ app.get("/guild", (req, res) => {
             res.redirect("/missing.html")
         }
     })
-})
+});
+
+app.get("/tickets", (req, res) => {
+    if(!req.query.guildId){
+        return res.send("Bad Request");
+    }
+    getAllTickets(req.query.guildId).then((tickets) => {
+       res.redirect("/guilds/tickets.html");
+       io.on("connection", (socket) => {
+            socket.emit("ticketLoad", tickets);
+       })
+    });
+});
+
+app.get("/username", async (req, res) => {
+    if(!req.query.id) return res.send("Bad Request");
+    const user = await client.users.fetch(req.query.id);
+    return res.send(user.username);
+});
 
 
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
@@ -118,8 +138,23 @@ const getGuildInfo = (guildID) => new Promise((resolve, reject) => {
     }).then((res) => {
         resolve(res.data)
     }).catch((reject))
-})
+});
 
+const getAllTickets = (guildID) => new Promise((resolve, reject) => {
+    let tickets = new Map();
+    const ticketNameRegex = new RegExp("ticket-(\\w+)-(\\d+)", "gi")
+    Guild.findOne({id: guildID}, (err, guild) => {
+       guild.tickets.forEach((ticketName) => {
+           const matches = [...ticketName.matchAll(ticketNameRegex)];
+           const id = matches[0][2];
+           TicketChannel.findOne({id: id}, (err, ticketChannel) => {
+               console.log(`Adding to tickets, ${ticketName} ${ticketChannel}`)
+               tickets.set(ticketName, ticketChannel);
+           });
+       });
+    });
+    resolve(tickets);
+});
 
 
 

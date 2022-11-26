@@ -24,7 +24,6 @@ function updateLastTalked(doc, id){
     doc.updateOne({ lastTalked: id }, (e) => {
         if (e) console.log(e)
     })
-    doc.save();
 }
 
 // parse the entire message, emojis, images, mentions, links, images
@@ -78,11 +77,11 @@ function cleanMessage(message) {
 }
 
 function fullMessage(message, id, formattedTimestamp) {
-    fs.appendFile(`./webserver/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
+    fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
         if(e) throw e;
         if(message.attachments){
             message.attachments.forEach((attachment) => {
-                fs.appendFile(`./webserver/tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}"></div>`, (e) => {
+                fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}"></div>`, (e) => {
                     if (e) throw e;
                 })
             })
@@ -91,7 +90,7 @@ function fullMessage(message, id, formattedTimestamp) {
 }
 
 function linkedFullImage(message, id, formattedTimestamp){
-    fs.appendFile(`./webserver/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div><div class="half-message"><img class="discordImage" src="${message.content}" alt="${message.content}"></div>`, (e) => {
+    fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div><div class="half-message"><img class="discordImage" src="${message.content}" alt="${message.content}"></div>`, (e) => {
         if(e) throw e;
     })
 }
@@ -127,10 +126,10 @@ module.exports = {
 
 
             if(!ticketChannel.participants.has(message.author.id)){
-                ticketChannel.participants.set(message.author.id, { messages: 1 })
+                ticketChannel.participants.set(message.author.id, { messages: 1 });
             } else {
                 let messages = ticketChannel.get(message.author.id)
-                ticketChannel.participants.set(message.author.id, { messages: messages++ })
+                ticketChannel.participants.set(message.author.id, { messages: messages++ });
             }
 
 
@@ -155,29 +154,31 @@ module.exports = {
 
                 const timeCurrently = moment().format("LT")
 
-                fs.appendFile(`./webserver/tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><span class="half-timestamp">${timeCurrently}</span><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
+                fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><span class="half-timestamp">${timeCurrently}</span><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
                     if(e) throw e;
-                    if(message.attachments){
+                    if(message.attachments.length > 0 ){
                         console.log("Attachment in half message")
                         message.attachments.forEach((attachment) => {
-                            fs.appendFile(`./webserver/tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}"></div>`, (e) => {
+                            fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}"></div>`, (e) => {
                                 if (e) throw e;
                             })
                         })
                     }
                 })
             }
+
+            ticketChannel.save();
         });
 
 
 
         Guild.findOne({id: message.guild.id}, (err, guild) => {
-           if(err) return;
+           if(err) return console.log(err);
            if(guild) return;
            else {
                const newGuild = new Guild({
                    id: message.guild.id,
-                   tickets: [],
+                   tickets: {},
                    settings: {
                        testSetting: false
                    }

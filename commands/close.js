@@ -40,7 +40,7 @@ module.exports = {
                 console.log(err)
             }
 
-            await fs.appendFile(`./webserver/tickets/${interaction.channel.name}-${id}.html`, `${await gatherEndHTML(ticketChannel, interaction)}</div></body></html>`, (e) => { if(e) throw e; })
+            await fs.appendFile(`./tickets/${interaction.channel.name}-${id}.html`, `${await gatherEndHTML(ticketChannel, interaction)}</div></body></html>`, (e) => { if(e) throw e; })
 
             ticketChannel.closed = true;
             ticketChannel.reason = reason ? reason : "Not Stated."

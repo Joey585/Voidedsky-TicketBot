@@ -11,5 +11,6 @@
     <orderEntry type="library" name="vue" level="application" />
     <orderEntry type="library" name="vue-discord-message" level="application" />
     <orderEntry type="library" name="axios" level="application" />
+    <orderEntry type="library" name="moment.js" level="application" />
   </component>
 </module>

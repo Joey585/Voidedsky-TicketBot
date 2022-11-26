@@ -24,6 +24,7 @@
 
 #ticket-frame {
     display: flex;
+    gap: 15px;
 }
 
 .ticket {

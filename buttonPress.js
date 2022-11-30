@@ -20,10 +20,10 @@ const ticketChannelSchema = new Schema({
 });
 const guildSchema = new Schema({
     id: String,
-    tickets: {
-      type: Map,
-      of: Object
-    },
+    tickets: [{
+      name: String,
+      ticketObj: Object
+    }],
     settings: {
         testSetting: Boolean
     }
@@ -76,7 +76,8 @@ function createTicket(interaction){
 
             Guild.findOne({id: interaction.guild.id}, (err, guild) => {
                 if(guild){
-                    guild.tickets.set(`${channel.name}-${id}`, newTicket);
+                    console.log(guild.tickets)
+                    guild.tickets.push({name: channel.name + "-" + id.toString(), ticketObj: newTicket});
                     guild.save();
                 }
             })

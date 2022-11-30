@@ -105,27 +105,11 @@ app.get("/tickets", (req, res) => {
     if(!req.query.guildId){
         return res.send("Bad Request");
     }
-    let tickets = []
-    const ticketNameRegex = new RegExp("ticket-(\\w+)-(\\d+)", "gi")
     Guild.findOne({id: req.query.guildId}, (err, guild) => {
-        for(const ticketName of guild.tickets){
-            const matches = [...ticketName.matchAll(ticketNameRegex)];
-            const id = matches[0][2];
-            TicketChannel.findOne({id: id}, (err, ticketChannel) => {
-                if(ticketChannel.closed){
-                    tickets.push(ticketChannel);
-                    console.log(`Adding to tickets, ${ticketName}`)
-                }
-            });
-        }
-        console.log("tickets: " + tickets.length + "\nguild tickets: " + guild.tickets.length);
-        if(tickets.length === guild.tickets.length){
-            res.redirect("/guilds/tickets.html");
-            io.on("connection", (socket) => {
-                socket.emit("ticketLoad", tickets);
-                console.log(tickets);
-            });
-        }
+        res.redirect("/guilds/tickets.html");
+        io.on("connection", (socket) => {
+            socket.emit("ticketLoad", guild.tickets);
+        });
     });
 });
 

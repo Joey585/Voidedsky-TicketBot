@@ -2,8 +2,8 @@ var socket = io();
 
 
 socket.once("ticketLoad", (tickets) => {
-    console.log(tickets)
-   tickets.forEach((ticket) => {
+    console.log(ticketArray)
+   for(const ticket in ticketArray) {
        fetch(`http://localhost:3000/username?id=${ticket.creatorID}`)
            .then(data=>{return data.json()})
            .then(res=>{
@@ -30,5 +30,5 @@ socket.once("ticketLoad", (tickets) => {
                const ticketFrame = document.getElementById("ticket-frame");
                ticketFrame.appendChild(ticketDiv)
            });
-   });
+   }
 });

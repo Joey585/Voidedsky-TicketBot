@@ -122,7 +122,20 @@ module.exports = {
             })
         }
 
-        TicketChannel.findOne({id: id}, async (err, ticketChannel) => {
+        Guild.findOne({id: message.guild.id}, async (err, guild) => {
+            if(err) return console.log(err);
+            if(guild === null) {
+                const newGuild = new Guild({
+                    id: message.guild.id,
+                    tickets: [],
+                    settings: {
+                        testSetting: false
+                    }
+                });
+                return newGuild.save();
+            }
+            const ticketChannel = guild.tickets.indexOf()
+            console.log(ticketChannel)
 
 
             if(!ticketChannel.participants.has(message.author.id)){
@@ -139,7 +152,7 @@ module.exports = {
             }
 
             if(ticketChannel.lastTalked === null) {
-                updateLastTalked(ticketChannel, message.author.id)
+                updateLastTalked(guild, message.author.id)
                 // if(containsLink(message)){
                 //
                 // }
@@ -169,25 +182,5 @@ module.exports = {
 
             ticketChannel.save();
         });
-
-
-
-        Guild.findOne({id: message.guild.id}, (err, guild) => {
-           if(err) return console.log(err);
-           if(guild) return;
-           else {
-               const newGuild = new Guild({
-                   id: message.guild.id,
-                   tickets: {},
-                   settings: {
-                       testSetting: false
-                   }
-               });
-               return newGuild.save();
-           }
-        });
-
-
-
     }
 }

@@ -5,7 +5,7 @@ const { containsLink } = require("../util/containsLink");
 const isImageUrl = require("is-image-url");
 const {Schema} = require("mongoose");
 const mongoose = require("mongoose");
-const {Guild, guildSchema} = require("../buttonPress");
+const {Guild, guildSchema} = require("../schemas/guild");
 
 
 
@@ -18,13 +18,6 @@ String.prototype.insert = function (index, string) {
     return string + this;
 };
 
-
-// update the database the id of the last person who talked
-function updateLastTalked(doc, id){
-    doc.updateOne({ lastTalked: id }, (e) => {
-        if (e) console.log(e)
-    })
-}
 
 // parse the entire message, emojis, images, mentions, links, images
 function cleanMessage(message) {
@@ -77,7 +70,7 @@ function cleanMessage(message) {
 }
 
 function fullMessage(message, id, formattedTimestamp) {
-    fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
+    fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
         if(e) throw e;
         if(message.attachments){
             message.attachments.forEach((attachment) => {
@@ -134,15 +127,25 @@ module.exports = {
                 });
                 return newGuild.save();
             }
-            const ticketChannel = guild.tickets.indexOf()
-            console.log(ticketChannel)
 
+            let ticketChannel;
+            let index;
+
+            guild.tickets.forEach((ticket) => {
+                if(ticket.name === `${message.channel.name}-${id}`) {
+                    ticketChannel = ticket;
+                    index = guild.tickets.map(t => t.name).indexOf(ticket.name);
+                }
+            });
+
+            if(ticketChannel === null) return;
 
             if(!ticketChannel.participants.has(message.author.id)){
                 ticketChannel.participants.set(message.author.id, { messages: 1 });
             } else {
-                let messages = ticketChannel.get(message.author.id)
-                ticketChannel.participants.set(message.author.id, { messages: messages++ });
+                let messages = ticketChannel.participants.get(message.author.id).messages
+                messages++;
+                ticketChannel.participants.set(message.author.id, { messages: messages });
             }
 
 
@@ -151,17 +154,22 @@ module.exports = {
                 console.log(err);
             }
 
-            if(ticketChannel.lastTalked === null) {
-                updateLastTalked(guild, message.author.id)
-                // if(containsLink(message)){
-                //
-                // }
+            if(ticketChannel.ticketObj.lastTalked === null) {
+                guild.updateLastTalked(index, message.author.id);
+                guild.markModified('anything');
+                console.log(ticketChannel.isNew)
+                guild.tickets[index].save((err) => {
+                    console.log("saved")
+                });
                 fullMessage(message, id, formattedTimestamp)
                 return;
             }
 
             if(ticketChannel.lastTalked !== message.author.id) {
-                updateLastTalked(ticketChannel, message.author.id)
+                guild.updateLastTalked(index, message.author.id);
+                guild.save((err) => {
+                    console.log(err)
+                });
                 fullMessage(message, id, formattedTimestamp)
             } else {
 
@@ -180,7 +188,7 @@ module.exports = {
                 })
             }
 
-            ticketChannel.save();
+            guild.save();
         });
     }
 }

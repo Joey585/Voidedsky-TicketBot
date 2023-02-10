@@ -9,7 +9,7 @@ const io = new Server(server);
 const { PermissionsBitField, BitField} = require('discord.js');
 const bitFieldCalculator = require("discord-bitfield-calculator");
 const {token} = require("../../config.json")
-const {Guild, TicketChannel} = require("../../buttonPress");
+const {Guild, TicketChannel} = require("../../schemas/guild");
 const {client} = require("../../index");
 
 

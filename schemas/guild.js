@@ -4,10 +4,10 @@ const guildSchema = new Schema({
     id: String,
     tickets: [{
         name: String,
-        participants: {
-          type: Map,
-          of: Object
-        },
+        participants: [{
+            userID: String,
+            messages: Number
+        }],
         ticketObj: Object
     }],
     settings: {
@@ -18,6 +18,9 @@ const guildSchema = new Schema({
 guildSchema.method({
     updateLastTalked: function (index, id){
         this.tickets[index].ticketObj.lastTalked = id;
+    },
+    addParticipant: function (index, id){
+        this.tickets[index].ticketObj.participants.set()
     }
 });
 

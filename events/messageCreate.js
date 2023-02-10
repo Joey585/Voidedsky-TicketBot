@@ -140,12 +140,24 @@ module.exports = {
 
             if(ticketChannel === null) return;
 
-            if(!ticketChannel.participants.has(message.author.id)){
-                ticketChannel.participants.set(message.author.id, { messages: 1 });
+            let participantIndex = -1;
+
+            ticketChannel.participants.forEach((person) => {
+                console.log(`Comparing ${person.userID} with ${message.author.id}`);
+                if(person.userID === message.author.id){
+                    console.log("worked")
+                   participantIndex = ticketChannel.participants.map(p => p.userID).indexOf(person.userID);
+                }
+            });
+
+            console.log(participantIndex);
+
+            if(participantIndex === -1){
+                ticketChannel.participants.push({userID: message.author.id,  messages: 1 });
             } else {
-                let messages = ticketChannel.participants.get(message.author.id).messages
+                let messages = ticketChannel.participants[index].messages;
                 messages++;
-                ticketChannel.participants.set(message.author.id, { messages: messages });
+                ticketChannel.participants[participantIndex] = {userID: message.author.id, messages: messages };
             }
 
 
@@ -154,22 +166,18 @@ module.exports = {
                 console.log(err);
             }
 
-            if(ticketChannel.ticketObj.lastTalked === null) {
-                guild.updateLastTalked(index, message.author.id);
-                guild.markModified('anything');
-                console.log(ticketChannel.isNew)
-                guild.tickets[index].save((err) => {
-                    console.log("saved")
-                });
+            if(ticketChannel.ticketObj.lastTalked === "") {
+                ticketChannel.ticketObj.lastTalked = message.author.id
+                guild.markModified("tickets");
+                await guild.save();
                 fullMessage(message, id, formattedTimestamp)
                 return;
             }
 
-            if(ticketChannel.lastTalked !== message.author.id) {
-                guild.updateLastTalked(index, message.author.id);
-                guild.save((err) => {
-                    console.log(err)
-                });
+            if(ticketChannel.ticketObj.lastTalked !== message.author.id) {
+                ticketChannel.ticketObj.lastTalked = message.author.id;
+                guild.markModified("tickets");
+                await guild.save();
                 fullMessage(message, id, formattedTimestamp)
             } else {
 
@@ -187,7 +195,6 @@ module.exports = {
                     }
                 })
             }
-
             guild.save();
         });
     }

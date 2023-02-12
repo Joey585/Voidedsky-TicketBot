@@ -36,7 +36,7 @@ socket.once("ticketLoad", (tickets) => {
                if(tickets[i].ticketObj.closed){
                    fetch(`http://localhost:3000/username?id=${tickets[i].ticketObj.closeUserId}`)
                        .then(data=>{return data.json()})
-                       .then(res => {closed.innerHTML = `Closed by ${res.username} for ${tickets[i].reason}`});
+                       .then(res => {closed.innerHTML = `Closed by ${res.username} for ${tickets[i].ticketObj.reason}`});
                }
 
 

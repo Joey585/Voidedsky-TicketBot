@@ -72,7 +72,7 @@
     flex-grow: 0;
     flex-shrink: 0;
     height: 44px;
-    margin: 17px 0 17px;
+    margin: 17px 0 0;
     min-height: 44px;
     position: relative;
     forced-color-adjust: none;
@@ -86,7 +86,7 @@
 }
 
 .half-message {
-    margin-bottom: 17px;
+    margin-bottom: -20px;
 }
 
 body {
@@ -109,12 +109,14 @@ body {
 
 .half-timestamp {
     display: block;
+    visibility: hidden;
     color: hsl(214,calc(var(--saturation-factor, 1)*4%),65.3%);
     font-size: 0.6875rem;
     text-align: right;
-    position: absolute;
+    position: relative;
     overflow-scrolling: auto;
     left: 0;
+    top: 10px;
     height: 1.375rem;
     line-height: 1.375rem;
     width: 56px;
@@ -122,7 +124,7 @@ body {
 }
 
 .half-message:hover .half-timestamp {
-    display: inline-block;
+    visibility: visible;
 }
 
 #member-list {
@@ -248,10 +250,10 @@ svg {
 }
 
 .discordImage {
-    margin-top: -10px;
-    width: 100%;
-    max-width: 300px;
-    max-height: 300px;
+    margin-top: 7px;
+    margin-bottom: 30px;
+    max-width: 700px;
+    max-height: 600px;
     display: block;
     aspect-ratio: 300 / 300;
     margin-left: 70px;

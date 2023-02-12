@@ -64,6 +64,8 @@ function cleanMessage(message) {
         messageContent = messageContent.replaceAll("emoji-small", "emoji-big").replaceAll("?size=44", "?size=96")
     }
 
+    messageContent = messageContent.replaceAll("\n", "<br>");
+
     // messageContent = messageContent.replaceAll(htmlRegexp, "");
 
     return messageContent
@@ -74,7 +76,7 @@ function fullMessage(message, id, formattedTimestamp) {
         if(e) throw e;
         if(message.attachments){
             message.attachments.forEach((attachment) => {
-                fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}"></div>`, (e) => {
+                fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}" style="width: ${Math.round(attachment.width / 2)}px; height: ${Math.round(attachment.height / 2)}px"></div>`, (e) => {
                     if (e) throw e;
                 })
             })
@@ -143,19 +145,16 @@ module.exports = {
             let participantIndex = -1;
 
             ticketChannel.participants.forEach((person) => {
-                console.log(`Comparing ${person.userID} with ${message.author.id}`);
                 if(person.userID === message.author.id){
-                    console.log("worked")
                    participantIndex = ticketChannel.participants.map(p => p.userID).indexOf(person.userID);
                 }
             });
 
-            console.log(participantIndex);
-
             if(participantIndex === -1){
+                console.log(`Adding new ${message.author.id} to participants`);
                 ticketChannel.participants.push({userID: message.author.id,  messages: 1 });
             } else {
-                let messages = ticketChannel.participants[index].messages;
+                let messages = ticketChannel.participants[participantIndex].messages;
                 messages++;
                 ticketChannel.participants[participantIndex] = {userID: message.author.id, messages: messages };
             }
@@ -170,6 +169,11 @@ module.exports = {
                 ticketChannel.ticketObj.lastTalked = message.author.id
                 guild.markModified("tickets");
                 await guild.save();
+            }
+            if(ticketChannel.ticketObj.lastTalked === null) {
+                ticketChannel.ticketObj.lastTalked = message.author.id;
+                guild.markModified('tickets');
+                guild.save();
                 fullMessage(message, id, formattedTimestamp)
                 return;
             }
@@ -185,10 +189,10 @@ module.exports = {
 
                 fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><span class="half-timestamp">${timeCurrently}</span><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
                     if(e) throw e;
-                    if(message.attachments.length > 0 ){
+                    if(message.attachments.size > 0 ){
                         console.log("Attachment in half message")
                         message.attachments.forEach((attachment) => {
-                            fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}"></div>`, (e) => {
+                            fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}" style="width: ${Math.round(attachment.width / 2)}px; height: ${Math.round(attachment.height / 2)}px"></div>`, (e) => {
                                 if (e) throw e;
                             })
                         })

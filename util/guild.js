@@ -14,5 +14,5 @@ module.exports = {
             });
             resolve({index: index, ticket: guild.tickets[index], guild: guild});
         });
-    })
+    }),
 }

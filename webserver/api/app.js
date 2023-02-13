@@ -119,6 +119,12 @@ app.get("/username", async (req, res) => {
     return res.json({username: user.username, id: req.query.id, statusCode: 200, tag: user.tag, avatarLink: user.avatarURL()});
 });
 
+app.get("/guildData", async (req, res) => {
+    if(!req.query.id) return res.send("Bad Request");
+    const data = await getGuildData(req.query.id);
+    return res.json(data);
+});
+
 
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
@@ -140,10 +146,26 @@ const getGuildInfo = (guildID) => new Promise((resolve, reject) => {
     }).catch((reject))
 });
 
-const getAllTickets = (guildID) => new Promise((resolve, reject) => {
+const getGuildData = (guildID) => new Promise((resolve, reject) => {
+    Guild.findOne({id: guildID}, async (err, guild) => {
+        if(err) reject(err);
 
+        const tickets = guild.tickets.length;
+        let messages = 0;
 
+        guild.tickets.forEach((ticket) => {
+            ticket.participants.forEach((person) => {
+                messages += person.messages
+            });
+        });
+
+        const guildDiscord = await client.guilds.fetch(guildID);
+
+        resolve({tickets: tickets, members: guildDiscord.memberCount, messages: messages});
+    })
 });
+
+
 
 
 

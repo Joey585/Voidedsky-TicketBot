@@ -27,11 +27,37 @@ html {
 #navbar {
     margin-left: 80%;
     display: flex;
+    position: relative;
+    left: -80%;
     gap: 20px;
 }
 
 .nav-button {
     text-decoration: none;
-    color: #A0A3A7;
+    color: #ffffff;
     font-size: x-large;
+}
+
+#intro {
+    color: white;
+    text-align: center;
+    font-size: xx-large;
+}
+
+#info {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10%;
+}
+
+.info {
+    text-align: center;
+    display: block;
+    width: 25%;
+    height: 50%;
+    font-size: x-large;
+    color: white;
+    border: #3498db solid 10px;
+    border-radius: 10px;
 }

@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { TicketChannel, ticketChannelSchema} = require("../buttonPress");
 const moment = require("moment");
 const { containsLink } = require("../util/containsLink");
 const isImageUrl = require("is-image-url");
@@ -76,7 +75,7 @@ function fullMessage(message, id, formattedTimestamp) {
         if(e) throw e;
         if(message.attachments){
             message.attachments.forEach((attachment) => {
-                fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}" style="width: ${Math.round(attachment.width / 2)}px; height: ${Math.round(attachment.height / 2)}px"></div>`, (e) => {
+                fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}" style="width: ${Math.round(attachment.width / 4)}px; height: ${Math.round(attachment.height / 4)}px"></div>`, (e) => {
                     if (e) throw e;
                 })
             })
@@ -192,9 +191,17 @@ module.exports = {
                     if(message.attachments.size > 0 ){
                         console.log("Attachment in half message")
                         message.attachments.forEach((attachment) => {
-                            fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}" style="width: ${Math.round(attachment.width / 2)}px; height: ${Math.round(attachment.height / 2)}px"></div>`, (e) => {
-                                if (e) throw e;
-                            })
+                            console.log(attachment)
+                            if(attachment.contentType.startsWith("video")){
+                                fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="discordVideo"><video controls width="${attachment.width / 2}"><source src="${attachment.url}"></video></div>`, (e) => {
+                                    if(e) throw e;
+                                })
+                            }
+                            if(attachment.contentType.startsWith("image")){
+                                fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="half-message"><img class="discordImage" src="${attachment.url}" alt="${attachment.name}" style="width: ${Math.round(attachment.width / 4)}px; height: ${Math.round(attachment.height / 4)}px"></div>`, (e) => {
+                                    if (e) throw e;
+                                })
+                            }
                         })
                     }
                 })

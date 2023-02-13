@@ -252,8 +252,8 @@ svg {
 .discordImage {
     margin-top: 7px;
     margin-bottom: 30px;
-    max-width: 700px;
-    max-height: 600px;
+    min-width: 100px;
+    min-height: 100px;
     display: block;
     aspect-ratio: 300 / 300;
     margin-left: 70px;

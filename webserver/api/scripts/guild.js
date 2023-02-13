@@ -4,17 +4,20 @@ socket.once("guildLoad", (guildInfo) => {
 
     document.title = guildInfo.name
 
+    console.log(guildInfo)
+
+    fetch(`http://localhost:3000/guildData?id=${guildInfo.id}`)
+        .then(data => {return data.json()})
+        .then(res => {
+            document.getElementById("members").innerText = `You have ${res.members} members`;
+            document.getElementById("tickets").innerText = `You made ${res.tickets} tickets`;
+            document.getElementById("messages").innerText = `There have been ${res.messages} messages in tickets`;
+        })
+
     document.getElementById("ticketLink").href = `/tickets?guildId=${guildInfo.id}`;
 
-    const serverIcon = document.createElement("img")
-    serverIcon.src = `https://cdn.discordapp.com/icons/${guildInfo.id}/${guildInfo.icon}.png?size=64`
-    serverIcon.alt = guildInfo.name
-
-    const serverName = document.createElement("span")
-    serverName.innerHTML = `${guildInfo.name}`
-    serverName.className = "server-name"
+    const intro = document.getElementById("intro")
+    intro.innerText = `Welcome ${guildInfo.name} to the panel!`
 
     const serverFrame = document.getElementById("server-frame")
-    serverFrame.appendChild(serverIcon)
-    serverFrame.appendChild(serverName)
 })

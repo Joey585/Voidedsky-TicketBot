@@ -30,6 +30,7 @@
 [] - Help<br>
 [] - Blacklist<br>
 [] - Jumptotop<br>
+[] - Closerequest<br>
 <h4>Back-end</h4>
 [] - Limit user to amount of tickets at once<br>
 

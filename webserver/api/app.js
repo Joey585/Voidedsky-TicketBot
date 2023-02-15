@@ -1,19 +1,18 @@
 const express = require("express");
-const path = require('path');
 const axios = require("axios")
 const app = express()
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-const { PermissionsBitField, BitField} = require('discord.js');
 const bitFieldCalculator = require("discord-bitfield-calculator");
 const {token} = require("../../config.json")
-const {Guild, TicketChannel} = require("../../schemas/guild");
+const {Guild} = require("../../schemas/guild");
 const {client} = require("../../index");
 
 
 app.use(express.static(__dirname));
+
 
 app.get("/callback", async (req, res) => {
         const accessCode = req.query.code
@@ -90,28 +89,35 @@ app.get("/guild", (req, res) => {
         res.send("Bad Request")
     }
     getGuildInfo(req.query.id).then((guild) => {
-        res.redirect("/guilds/guild.html")
-        io.on("connection", (socket) => {
-            socket.emit("guildLoad", guild)
-        })
+        res.redirect("/guilds/guild.html");
+        Guild.findOne({id: guild.id}, (err, guildDb) => {
+            if(err) throw err;
+            io.on("connection", (socket) => {
+                socket.emit("guildLoad", guild);
+                socket.emit("ticketLoad", guildDb.tickets);
+            })
+        });
+
     }).catch((e) => {
-        if(e.response.status === 403){
+
+        console.log(e)
+        if(e.response.status === 404){
             res.redirect("/missing.html")
         }
     })
 });
 
-app.get("/tickets", (req, res) => {
-    if(!req.query.guildId){
-        return res.send("Bad Request");
-    }
-    Guild.findOne({id: req.query.guildId}, (err, guild) => {
-        res.redirect("/guilds/tickets.html");
-        io.on("connection", (socket) => {
-            socket.emit("ticketLoad", guild.tickets);
-        });
-    });
-});
+// app.get("/tickets", (req, res) => {
+//     if(!req.query.guildId){
+//         return res.send("Bad Request");
+//     }
+//     Guild.findOne({id: req.query.guildId}, (err, guild) => {
+//         res.redirect(`/guild?id=${req.query.guildId}`)
+//         io.on("connection", (socket) => {
+//             socket.emit("ticketLoad", guild.tickets);
+//         });
+//     });
+// });
 
 app.get("/username", async (req, res) => {
     if(!req.query.id) return res.send("Bad Request");
@@ -170,4 +176,7 @@ const getGuildData = (guildID) => new Promise((resolve, reject) => {
 
 
 
-server.listen(3000, () => {console.log("API on.")})
+server.listen(3000, () => {console.log("API on.")});
+server.on("error", (err) => {
+    console.log(err)
+})

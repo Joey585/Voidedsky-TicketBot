@@ -6,25 +6,28 @@
 
 .hover-stats .stats {
     visibility: hidden;
-    width: 120px;
+    width: max-content;
     background-color: black;
     color: #fff;
     text-align: left;
     border-radius: 6px;
-    padding: 5px 0;
     position: absolute;
     z-index: 1;
     top: -5px;
     left: 105%;
+    padding: 5px 5px 5px;
 }
 
 .hover-stats:hover .stats {
     visibility: visible;
 }
 
-#ticket-frame {
+#tickets-frame {
+    margin-top: 5%;
     display: flex;
     gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .ticket {

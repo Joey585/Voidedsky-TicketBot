@@ -4,19 +4,25 @@
     <meta charset="UTF-8">
     <title>Server Name</title>
     <link rel="stylesheet" href="../css/guild.css">
+    <link rel="stylesheet" href="../css/tickets.css">
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.3/moment.min.js"></script>
 </head>
 <body>
+
+<div id="loading"></div>
 
 <div id="server-frame">
 
     <div id="navbar">
+        <a class="nav-button" id="homeLink">Home</a>
         <a class="nav-button" id="ticketLink">Tickets</a>
         <a class="nav-button">Permissions</a>
         <a class="nav-button">Settings</a>
+        <img src="../assets/refresh.png" alt="refresh_button" id="refresh-button">
     </div>
 
 </div>
-<hr>
+<hr id="slice">
 <div id="lower-info">
     <h2 id="intro">Welcome {server} to the panel</h2>
     <div id="info">
@@ -31,6 +37,17 @@
         </div>
     </div>
 </div>
+<div id="tickets-frame">
+
+</div>
+<div id="settings-frame">
+
+</div>
+<div id="permissions-frame">
+
+
+</div>
+
 
 
 

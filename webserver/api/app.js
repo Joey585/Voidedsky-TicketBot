@@ -88,16 +88,21 @@ app.get("/guild", (req, res) => {
     if(!req.query.id){
         res.send("Bad Request")
     }
+    console.log("Request made with " + req.query.id);
     getGuildInfo(req.query.id).then((guild) => {
-        res.redirect("/guilds/guild.html");
+        console.log("Received Guild info from discord");
         Guild.findOne({id: guild.id}, (err, guildDb) => {
+            console.log(`Received guild from database ${guildDb}`)
             if(err) throw err;
+            res.redirect("/guilds/guild.html");
             io.on("connection", (socket) => {
+                console.log("Socket connected.")
                 socket.emit("guildLoad", guild);
                 socket.emit("ticketLoad", guildDb.tickets);
+                console.log("Emitted all socket events");
             })
         });
-
+        console.log("Redirected")
     }).catch((e) => {
 
         console.log(e)

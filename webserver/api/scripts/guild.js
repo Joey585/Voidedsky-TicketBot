@@ -3,8 +3,7 @@ var socket = io();
 socket.once("guildLoad", (guildInfo) => {
     status("loading")
     document.title = guildInfo.name
-
-    console.log(guildInfo)
+    document.getElementById("refresh-button").href = `/guild?id=${guildInfo.id}`
 
     fetch(`http://localhost:3000/guildData?id=${guildInfo.id}`)
         .then(data => {return data.json()})
@@ -14,16 +13,13 @@ socket.once("guildLoad", (guildInfo) => {
             document.getElementById("messages").innerText = `There have been ${res.messages} messages in tickets`;
         })
 
-    window.onbeforeunload = function(e) {
-        console.log("reloaded")
-        location.assign(`/guild?id=${guildInfo.id}`)
-    }
-
     const intro = document.getElementById("intro")
     intro.innerText = `Welcome ${guildInfo.name} to the panel!`
 });
 
 socket.once("ticketLoad", (tickets) => {
+    console.log(tickets)
+
     const ticketFrame = document.getElementById("tickets-frame");
 
     for(let i=0; i < tickets.length; i++) {
@@ -71,8 +67,8 @@ socket.once("ticketLoad", (tickets) => {
                 participantsDiv.appendChild(participants);
                 ticketDiv.appendChild(participantsDiv);
                 ticketFrame.appendChild(ticketDiv);
+
                 status("doneLoading");
-                // hide("home")
             });
     }
 });

@@ -50,11 +50,9 @@ app.get("/guild", (req, res) => {
     if(!req.query.id) {
         res.send("Bad Request")
     }
-    console.log("Request made with " + req.query.id);
     getGuildInfo(req.query.id).then((guild) => {
         console.log("Received Guild info from discord");
         Guild.findOne({id: guild.id}, (err, guildDb) => {
-            console.log(`Received guild from database ${guildDb}`)
             if(err) throw err;
                 return res.json({
                     guildDb: guildDb,
@@ -62,8 +60,9 @@ app.get("/guild", (req, res) => {
                 })
             })
     }).catch((e) => {
-        if(e.response.status === 404) {
-            res.redirect("/missing.html")
+        console.log(e.response.data.message)
+        if(e.response.data.message === "Unknown Guild") {
+            return res.sendStatus(401);
         }
     })
 });

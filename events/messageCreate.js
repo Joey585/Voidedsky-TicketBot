@@ -71,7 +71,7 @@ function cleanMessage(message) {
 }
 
 function fullMessage(message, id, formattedTimestamp) {
-    fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
+    fs.appendFile(`./tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? message.member.nickname : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div>`, (e) => {
         if(e) throw e;
         if(message.attachments){
             message.attachments.forEach((attachment) => {
@@ -84,7 +84,7 @@ function fullMessage(message, id, formattedTimestamp) {
 }
 
 function linkedFullImage(message, id, formattedTimestamp){
-    fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? null : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div><div class="half-message"><img class="discordImage" src="${message.content}" alt="${message.content}"></div>`, (e) => {
+    fs.appendFile(`./webserver/api/tickets/${message.channel.name}-${id}.html`, `<div class="full-message"><img class="pfp" src="${message.author.displayAvatarURL()}" alt="${message.author.username}"><h2><span style="color: ${message.member.displayHexColor}" class="username">${message.member.nickname ? message.member.nickname : message.author.username}</span><span style="color: #A0A3A7" class="timestamp">${formattedTimestamp}</span></h2><p style="color: hsl(210,calc(var(--saturation-factor, 1)*2.9%),86.7%);" class="content">${cleanMessage(message)}</p></div><div class="half-message"><img class="discordImage" src="${message.content}" alt="${message.content}"></div>`, (e) => {
         if(e) throw e;
     })
 }
@@ -150,7 +150,6 @@ module.exports = {
             });
 
             if(participantIndex === -1){
-                console.log(`Adding new ${message.author.id} to participants`);
                 ticketChannel.participants.push({userID: message.author.id,  messages: 1 });
             } else {
                 let messages = ticketChannel.participants[participantIndex].messages;

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle} = require('discord.js');
+const {Guild} = require("../schemas/guild");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -51,6 +52,19 @@ module.exports = {
             );
         channel.send({ embeds: [panelEmbed], components: [row] }).then(() => {
             interaction.reply({content: "Successfully created panel!", ephemeral: true})
+
+            Guild.findOne({id: interaction.guild.id}, (err, guild) => {
+                if(!guild){
+                    const newGuild = new Guild({
+                        id: interaction.guild.id,
+                        tickets: [],
+                        settings: {
+                            testSetting: false
+                        }
+                    });
+                    return newGuild.save();
+                }
+            })
         })
 
     }

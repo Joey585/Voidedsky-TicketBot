@@ -4,7 +4,6 @@ fetch(`/guild?id=${params.get("id")}`)
     .then(data=>{return data.json()})
     .then(res=> {
         status("loading")
-        console.log("Got large guild data");
         document.title = res.guild.name
         fetch(`http://localhost:3000/guildData?id=${res.guild.id}`)
             .then(data => {
@@ -27,7 +26,6 @@ fetch(`/guild?id=${params.get("id")}`)
                     return data.json()
                 })
                 .then(user => {
-                    console.log("Got a ticket data");
                     const ticketDiv = document.createElement("div")
                     ticketDiv.classList.add("ticket");
                     const ticketLink = document.createElement("a");
@@ -79,7 +77,9 @@ fetch(`/guild?id=${params.get("id")}`)
                     status("doneLoading");
                 });
         }
-    });
+    }).catch((e) => {
+        return location.assign("/missing.html")
+    })
 
 document.getElementById("ticketLink").addEventListener("click", () => {
     status("tickets");
@@ -87,6 +87,10 @@ document.getElementById("ticketLink").addEventListener("click", () => {
 
 document.getElementById("homeLink").addEventListener("click", () => {
     status("home")
+});
+
+document.getElementById("backLink").addEventListener("click", () => {
+   location.assign(`/home.html?accessToken=${localStorage.getItem("accessToken")}&tokenType=${localStorage.getItem("tokenType")}`)
 });
 
 function status(current) {

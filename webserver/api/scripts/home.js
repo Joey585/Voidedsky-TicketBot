@@ -15,6 +15,8 @@ fetch(`/allGuilds?accessToken=${accessToken}&tokenType=${tokenType}`)
         res.guilds.forEach((guild) => {
             createGuild(guild)
         })
+    }).catch(() => {
+        return location.assign("/");
     })
 
 function createGuild(guild){

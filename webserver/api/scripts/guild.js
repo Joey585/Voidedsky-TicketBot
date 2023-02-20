@@ -5,7 +5,7 @@ fetch(`/guild?id=${params.get("id")}`)
     .then(res=> {
         status("loading")
         document.title = res.guild.name
-        fetch(`http://localhost:3000/guildData?id=${res.guild.id}`)
+        fetch(`/guildData?id=${res.guild.id}`)
             .then(data => {
                 return data.json()
             })
@@ -21,7 +21,7 @@ fetch(`/guild?id=${params.get("id")}`)
 
         const ticketFrame = document.getElementById("tickets-frame");
         for (let i = 0; i < res.guildDb.tickets.length; i++) {
-            fetch(`http://localhost:3000/username?id=${res.guildDb.tickets[i].ticketObj.creatorID}`)
+            fetch(`/username?id=${res.guildDb.tickets[i].ticketObj.creatorID}`)
                 .then(data => {
                     return data.json()
                 })
@@ -45,7 +45,7 @@ fetch(`/guild?id=${params.get("id")}`)
 
 
                     res.guildDb.tickets[i].participants.forEach((person) => {
-                        fetch(`http://localhost:3000/username?id=${person.userID}`)
+                        fetch(`/username?id=${person.userID}`)
                             .then(data => {
                                 return data.json()
                             }).then((res) => {
@@ -56,7 +56,7 @@ fetch(`/guild?id=${params.get("id")}`)
 
 
                     if(res.guildDb.tickets[i].ticketObj.closed) {
-                        fetch(`http://localhost:3000/username?id=${tickets[i].ticketObj.closeUserId}`)
+                        fetch(`/username?id=${tickets[i].ticketObj.closeUserId}`)
                             .then(data => {
                                 return data.json()
                             })

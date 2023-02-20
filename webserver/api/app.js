@@ -7,6 +7,9 @@ const bitFieldCalculator = require("discord-bitfield-calculator");
 const {token} = require("../../config.json")
 const {Guild} = require("../../schemas/guild");
 const {client} = require("../../index");
+const os = require("os");
+
+
 
 app.use(express.static(__dirname));
 

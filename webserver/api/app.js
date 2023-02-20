@@ -140,7 +140,7 @@ const getGuildData = (guildID) => new Promise((resolve, reject) => {
 });
 
 const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
-    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=http://localhost:3000/callback&scope=identity`;
+    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=http://voidedsky.net:50000/callback&scope=identity`;
     let headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
     }
@@ -158,7 +158,7 @@ const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
 
 
 
-server.listen(3000, () => {console.log("API on.")});
+server.listen(50000, () => {console.log("API on.")});
 server.on("error", (err) => {
     console.log(err)
 })

@@ -1,30 +1,28 @@
-var socket = io();
+const params = new URL(document.location).searchParams;
+const accessToken = params.get("accessToken");
+const tokenType = params.get("tokenType");
+localStorage.setItem("accessToken", accessToken);
+localStorage.setItem("tokenType", tokenType);
 
-socket.once("auth", (data) => {
-    const title = document.getElementById("start_title");
-    title.innerHTML = `Servers for ${data.user.username}`
-    document.title = `${data.user.username} Ticket Dashboard`
 
-    localStorage.setItem("accessToken", data.access_token)
-
-    const user = data.user;
-
-    console.log(user)
-
-    data.guilds.forEach((guild) => {
-        createGuild(guild)
+fetch(`/allGuilds?accessToken=${accessToken}&tokenType=${tokenType}`)
+    .then(data=>{return data.json()})
+    .then(res=>{
+        document.getElementById("loading").style.display = "none";
+        const title = document.getElementById("start_title");
+        title.innerHTML = `Servers for ${res.user.username}`
+        document.title = `${res.user.username} Ticket Dashboard`
+        res.guilds.forEach((guild) => {
+            createGuild(guild)
+        })
     })
-})
-
-
-
 
 function createGuild(guild){
     const guildFrame = document.getElementById("server-frame")
 
     const guildClick = document.createElement("a")
     guildClick.style.textDecoration = "none";
-    guildClick.href = `/guild?id=${guild.id}`
+    guildClick.href = `/guilds/guild.html?id=${guild.id}`
     guildClick.style.textDecoration = "none"
     guildClick.style.color = "black"
 

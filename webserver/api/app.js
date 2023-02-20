@@ -3,89 +3,51 @@ const axios = require("axios")
 const app = express()
 const http = require('http');
 const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
 const bitFieldCalculator = require("discord-bitfield-calculator");
 const {token} = require("../../config.json")
 const {Guild} = require("../../schemas/guild");
 const {client} = require("../../index");
 
-
 app.use(express.static(__dirname));
 
-
 app.get("/callback", async (req, res) => {
-        const accessCode = req.query.code
+    const accessCode = req.query.code
+    if(!accessCode) {
+        return;
+    }
+    getAccessToken(accessCode).then((data) => {
+        return res.redirect(`/home.html?accessToken=${data.access_token}&tokenType=${data.token_type}`);
+    })
+});
 
-        let accessGuilds = []
-
-        if(!accessCode) {
-            return;
-        }
-
-
-        const getAccessToken = new Promise((resolve, reject) => {
-
-            if(!accessCode) {
-                return;
-            }
-
-            let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=http://localhost:3000/callback&scope=identity`;
-            let headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-
-            axios.post('https://discord.com/api/oauth2/token', data, {
-                headers: {
-                    headers
+app.get("/allGuilds", (req, res) => {
+    let accessGuilds = [];
+    axios.get('https://discord.com/api/users/@me', {
+        headers: {
+            authorization: `${req.query.tokenType} ${req.query.accessToken}`,
+        },
+    }).then(response => {
+        getGuilds(req.query.accessToken).then((guildData) => {
+            guildData.forEach((guild) => {
+                const permissions = bitFieldCalculator.permissions(guild.permissions);
+                if(permissions.includes("BAN_MEMBERS")) {
+                    accessGuilds.push(guild)
                 }
-            }).then((r) => {
-                resolve(r.data)
             })
-                .catch(() => {
-                    reject("Unable to get access token!")
-                })
-        });
-
-
-
-        getAccessToken.then((data) => {
-            axios.get('https://discord.com/api/users/@me', {
-                headers: {
-                    authorization: `${data.token_type} ${data.access_token}`,
-                },
+            return res.json({
+                user: response.data,
+                access_token: response.access_token,
+                guilds: accessGuilds,
+                accessToken: response.access_token
             })
-                .then(response => {
-                    console.log("Successful authentication made.")
-                    getGuilds(data.access_token).then((guildData) => {
-                        guildData.forEach((guild) => {
-                            const permissions = bitFieldCalculator.permissions(guild.permissions);
-                            if(permissions.includes("BAN_MEMBERS")){
-                                accessGuilds.push(guild)
-                            }
-                        })
-
-                        res.redirect(`/home.html`)
-                        io.on("connection", async (socket) => {
-                            socket.emit("auth", {
-                                user: response.data,
-                                access_token: data.access_token,
-                                guilds: accessGuilds
-                            })
-                        })
-                    })
-
-
-                })
-                .catch(console.error);
-        }).catch((e) => {
-            console.log(e)
         })
-})
-
+    }).catch((e) => {
+        return res.sendStatus(401);
+    })
+});
 
 app.get("/guild", (req, res) => {
-    if(!req.query.id){
+    if(!req.query.id) {
         res.send("Bad Request")
     }
     console.log("Request made with " + req.query.id);
@@ -94,19 +56,13 @@ app.get("/guild", (req, res) => {
         Guild.findOne({id: guild.id}, (err, guildDb) => {
             console.log(`Received guild from database ${guildDb}`)
             if(err) throw err;
-            res.redirect("/guilds/guild.html");
-            io.on("connection", (socket) => {
-                console.log("Socket connected.")
-                socket.emit("guildLoad", guild);
-                socket.emit("ticketLoad", guildDb.tickets);
-                console.log("Emitted all socket events");
+                return res.json({
+                    guildDb: guildDb,
+                    guild: guild
+                })
             })
-        });
-        console.log("Redirected")
     }).catch((e) => {
-
-        console.log(e)
-        if(e.response.status === 404){
+        if(e.response.status === 404) {
             res.redirect("/missing.html")
         }
     })
@@ -127,7 +83,13 @@ app.get("/guild", (req, res) => {
 app.get("/username", async (req, res) => {
     if(!req.query.id) return res.send("Bad Request");
     const user = await client.users.fetch(req.query.id);
-    return res.json({username: user.username, id: req.query.id, statusCode: 200, tag: user.tag, avatarLink: user.avatarURL()});
+    return res.json({
+        username: user.username,
+        id: req.query.id,
+        statusCode: 200,
+        tag: user.tag,
+        avatarLink: user.avatarURL()
+    });
 });
 
 app.get("/guildData", async (req, res) => {
@@ -135,7 +97,6 @@ app.get("/guildData", async (req, res) => {
     const data = await getGuildData(req.query.id);
     return res.json(data);
 });
-
 
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
@@ -176,7 +137,21 @@ const getGuildData = (guildID) => new Promise((resolve, reject) => {
     })
 });
 
+const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
+    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=http://localhost:3000/callback&scope=identity`;
+    let headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
 
+    axios.post('https://discord.com/api/oauth2/token', data, {
+        headers: { headers }
+    }).then((r) => {
+        console.log(r.data)
+        resolve(r.data)
+    }).catch(() => {
+        reject("Unable to get access token!")
+    })
+});
 
 
 

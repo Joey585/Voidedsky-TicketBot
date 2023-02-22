@@ -78,7 +78,7 @@ fetch(`/guild?id=${params.get("id")}`)
                 });
         }
     }).catch((e) => {
-        return location.assign("/missing.html")
+        // return location.assign("/missing.html")
     })
 
 document.getElementById("ticketLink").addEventListener("click", () => {
@@ -87,6 +87,10 @@ document.getElementById("ticketLink").addEventListener("click", () => {
 
 document.getElementById("homeLink").addEventListener("click", () => {
     status("home")
+});
+
+document.getElementById("settingsLink").addEventListener("click", () => {
+   status("settings");
 });
 
 document.getElementById("backLink").addEventListener("click", () => {
@@ -118,5 +122,7 @@ function status(current) {
     } else if(current === "home") {
         document.getElementById("lower-info").style.display = "block";
         document.getElementById("tickets-frame").style.display = "none";
+    } else if(current === "settings"){
+
     }
 }

@@ -94,3 +94,38 @@ html {
     100% { transform: rotate(0deg);}
     
 }
+
+#settings-frame label {
+    color: #ffffff;
+}
+
+#currentSettings {
+    background-color: #32353B;
+    padding: 25px;
+
+}
+
+#currentHeader {
+    display: flex;
+    gap: 10px;
+}
+
+#currentHeader p {
+    color: white;
+    font-size: 35px;
+    text-wrap: avoid;
+    margin: auto;
+}
+
+#currentSettings img {
+    border-radius: 100%;
+}
+
+.setting {
+    color: white;
+}
+
+#allCurrentSettings {
+    display: flex;
+    gap: 30px;
+}

@@ -65,6 +65,24 @@ fetch(`/guild?id=${params.get("id")}`)
                             });
                     }
 
+                    const discordSettingChannels = document.getElementsByClassName("discordChannel");
+                    let channels = ["test", "hello", "logs", "staff-chat"];
+
+                    // TODO: Use dropdowns dumbass
+
+                    for(let i= 0; i < discordSettingChannels.length; i++){
+                        discordSettingChannels[i].addEventListener("click", () => {
+                            const allChannels = document.createElement("div");
+                            for (const channel of channels){
+                                const channelChild = document.createElement("p");
+                                channelChild.innerText = `#${channel}`;
+                                channelChild.className = "discordChannel";
+                                allChannels.appendChild(channelChild);
+                            }
+                        });
+                    }
+
+
 
                     ticketDiv.appendChild(ticketLink);
                     ticketDiv.appendChild(createdBy);
@@ -78,7 +96,7 @@ fetch(`/guild?id=${params.get("id")}`)
                 });
         }
     }).catch((e) => {
-        // return location.assign("/missing.html")
+        // return location.assign("/missing.html");
     })
 
 document.getElementById("ticketLink").addEventListener("click", () => {
@@ -96,6 +114,7 @@ document.getElementById("settingsLink").addEventListener("click", () => {
 document.getElementById("backLink").addEventListener("click", () => {
    location.assign(`/home.html?accessToken=${localStorage.getItem("accessToken")}&tokenType=${localStorage.getItem("tokenType")}`)
 });
+
 
 function status(current) {
     if(current === "loading") {
@@ -117,12 +136,16 @@ function status(current) {
         document.getElementById("slice").style.display = "block";
         document.getElementById("loading").style.display = "none";
     } else if(current === "tickets") {
+        document.getElementById("settings-frame").style.display = "none";
         document.getElementById("lower-info").style.display = "none";
         document.getElementById("tickets-frame").style.display = "flex";
     } else if(current === "home") {
+        document.getElementById("settings-frame").style.display = "none";
         document.getElementById("lower-info").style.display = "block";
         document.getElementById("tickets-frame").style.display = "none";
     } else if(current === "settings"){
-
+        document.getElementById("settings-frame").style.display = "block";
+        document.getElementById("lower-info").style.display = "none";
+        document.getElementById("tickets-frame").style.display = "none";
     }
 }

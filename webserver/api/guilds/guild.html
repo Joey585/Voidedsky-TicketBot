@@ -5,6 +5,7 @@
     <title>Server Name</title>
     <link rel="stylesheet" href="../css/guild.css">
     <link rel="stylesheet" href="../css/tickets.css">
+    <link rel="stylesheet" href="../css/main-discord.css">
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.3/moment.min.js"></script>
 </head>
 <body>
@@ -41,18 +42,24 @@
 
 </div>
 <div id="settings-frame">
-    <label for="logChannel">Log Channel:</label>
-    <input id="logChannel">
+    <div id="currentSettings">
+        <div id="currentHeader">
+            <img src="https://cdn.discordapp.com/icons/822309147118141480/7bd716942ee15edf6cb4c1cb5120cd43.webp?size=96" alt="585 Cache">
+            <p>585 Cache Settings</p>
+        </div>
+        <hr>
+        <div id="allCurrentSettings">
+            <p class="setting">Log Channel: <span class="discordChannel">#balls</span></p>
+            <p class="setting">Ticket Category: <span class="discordChannel">tickets</span></p>
+        </div>
+
+    </div>
 </div>
 <div id="permissions-frame">
 
 </div>
 
 
-
-
-
-<script src="/socket.io/socket.io.js"></script>
 <script src="../scripts/guild.js"></script>
 </body>
 </html>

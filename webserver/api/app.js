@@ -4,7 +4,7 @@ const app = express()
 const http = require('http');
 const server = http.createServer(app);
 const bitFieldCalculator = require("discord-bitfield-calculator");
-const {token} = require("../../config.json")
+const {token, callback} = require("../../config.json")
 const {Guild} = require("../../schemas/guild");
 const {client} = require("../../index");
 
@@ -97,6 +97,12 @@ app.get("/guildData", async (req, res) => {
     return res.json(data);
 });
 
+app.get("/guildChannels", async (req, res) => {
+   if(!req.query.id) return res.send("Bad Request");
+   const data = await getGuildChannels(req.query.id);
+   return res.json(data);
+});
+
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
         headers: {
@@ -115,6 +121,16 @@ const getGuildInfo = (guildID) => new Promise((resolve, reject) => {
     }).then((res) => {
         resolve(res.data)
     }).catch((reject))
+});
+
+const getGuildChannels = (guildID) => new Promise((resolve, reject) => {
+   axios.get(`https://discord.com/api/guilds/${guildID}/channels`, {
+       headers: {
+           authorization: `Bot ${token}`
+       }
+   }).then((res) => {
+       resolve(res.data)
+   }).catch((reject))
 });
 
 const getGuildData = (guildID) => new Promise((resolve, reject) => {
@@ -137,7 +153,7 @@ const getGuildData = (guildID) => new Promise((resolve, reject) => {
 });
 
 const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
-    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=http://voidedsky.net:50000/callback&scope=identity`;
+    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=${callback}&scope=identity`;
     let headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
     }

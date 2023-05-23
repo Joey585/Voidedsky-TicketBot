@@ -53,35 +53,32 @@ fetch(`/guild?id=${params.get("id")}`)
                         })
 
                     });
-
-
                     if(res.guildDb.tickets[i].ticketObj.closed) {
-                        fetch(`/username?id=${tickets[i].ticketObj.closeUserId}`)
+                        fetch(`/username?id=${res.guildDb.tickets[i].ticketObj.closeUserId}`)
                             .then(data => {
                                 return data.json()
                             })
-                            .then(res => {
-                                closed.innerHTML = `Closed by ${res.username} for <code>${res.guildDb.tickets[i].ticketObj.reason}</code>`
+                            .then(closeUser => {
+                                closed.innerHTML = `Closed by ${closeUser.username} for <code>${res.guildDb.tickets[i].ticketObj.reason}</code>`
                             });
                     }
 
-                    const discordSettingChannels = document.getElementsByClassName("discordChannel");
-                    let channels = ["test", "hello", "logs", "staff-chat"];
-
-                    // TODO: Use dropdowns dumbass
-
-                    for(let i= 0; i < discordSettingChannels.length; i++){
-                        discordSettingChannels[i].addEventListener("click", () => {
-                            const allChannels = document.createElement("div");
-                            for (const channel of channels){
-                                const channelChild = document.createElement("p");
-                                channelChild.innerText = `#${channel}`;
-                                channelChild.className = "discordChannel";
-                                allChannels.appendChild(channelChild);
-                            }
-                        });
-                    }
-
+                    // const discordSettingChannels = document.getElementsByClassName("discordChannel");
+                    // let channels = ["test", "hello", "logs", "staff-chat"];
+                    //
+                    // // TODO: Use dropdowns dumbass
+                    //
+                    // for(let i= 0; i < discordSettingChannels.length; i++){
+                    //     discordSettingChannels[i].addEventListener("click", () => {
+                    //         const allChannels = document.createElement("div");
+                    //         for (const channel of channels){
+                    //             const channelChild = document.createElement("p");
+                    //             channelChild.innerText = `#${channel}`;
+                    //             channelChild.className = "discordChannel";
+                    //             allChannels.appendChild(channelChild);
+                    //         }
+                    //     });
+                    // }
 
 
                     ticketDiv.appendChild(ticketLink);
@@ -92,9 +89,27 @@ fetch(`/guild?id=${params.get("id")}`)
                     ticketDiv.appendChild(participantsDiv);
                     ticketFrame.appendChild(ticketDiv);
 
-                    status("doneLoading");
+
                 });
         }
+
+        console.log("Attempting to load channels")
+        fetch(`/guildChannels?id=${params.get("id")}`)
+            .then(data => {return data.json()})
+            .then((res) => {
+                const channelList = res.filter(channel => channel.type === 0);
+                console.log(channelList);
+                for(let c = 0; c < channelList.length; c++){
+                    const channelLink = document.createElement("a");
+                    const dropdown = document.getElementById("logChannels");
+                    console.log(channelList[c].name)
+                    channelLink.innerText = `${channelList[c].name}`;
+                    channelLink.className = 'channel'
+                    dropdown.appendChild(channelLink);
+                }
+            });
+
+        status("doneLoading");
     }).catch((e) => {
         // return location.assign("/missing.html");
     })
@@ -132,7 +147,7 @@ function status(current) {
         document.getElementById("lower-info").style.display = "block";
         document.getElementById("tickets-frame").style.display = "none";
         document.getElementById("permissions-frame").style.display = "block";
-        document.getElementById("settings-frame").style.display = "block";
+        document.getElementById("settings-frame").style.display = "none";
         document.getElementById("slice").style.display = "block";
         document.getElementById("loading").style.display = "none";
     } else if(current === "tickets") {
@@ -148,4 +163,25 @@ function status(current) {
         document.getElementById("lower-info").style.display = "none";
         document.getElementById("tickets-frame").style.display = "none";
     }
+}
+
+function showChannels(){
+    document.getElementById("logChannels").classList.toggle("show");
+}
+
+function filterChannels(){
+    let input, filter, ul, li, a, i;
+    input = document.getElementById("logChannelInput");
+    filter = input.value.toLowerCase();
+    const div = document.getElementById("logChannels");
+    a = div.getElementsByTagName("a");
+    for (i = 0; i < a.length; i++){
+        let txtValue = a[i].textContent || a[i].innerText;
+        if(txtValue.toLowerCase().indexOf(filter) > -1){
+            a[i].style.display = "";
+        } else {
+            a[i].style.display = "none";
+        }
+    }
+
 }

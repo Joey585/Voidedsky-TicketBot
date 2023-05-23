@@ -11,7 +11,7 @@ const guildSchema = new Schema({
         ticketObj: Object
     }],
     settings: {
-        testSetting: Boolean
+        logChannel: String
     }
 });
 

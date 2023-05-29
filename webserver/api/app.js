@@ -168,6 +168,10 @@ const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
     })
 });
 
+const postLogChannel = (channelId) => new Promise((resolve, reject) => {
+
+});
+
 
 
 

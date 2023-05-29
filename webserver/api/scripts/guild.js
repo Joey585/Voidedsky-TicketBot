@@ -104,7 +104,9 @@ fetch(`/guild?id=${params.get("id")}`)
                     const dropdown = document.getElementById("logChannels");
                     console.log(channelList[c].name)
                     channelLink.innerText = `${channelList[c].name}`;
-                    channelLink.className = 'channel'
+                    channelLink.className = 'channel';
+                    channelLink.id = channelList[c].id;
+                    channelLink.addEventListener("click", (event) => handleChannelClick(event));
                     dropdown.appendChild(channelLink);
                 }
             });
@@ -184,4 +186,11 @@ function filterChannels(){
         }
     }
 
+}
+
+function handleChannelClick(event){
+    switch (event.target.parentNode.id){
+        case "logChannels":
+
+    }
 }

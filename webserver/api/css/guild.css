@@ -184,3 +184,7 @@ html {
 .show {
     display: block;
 }
+
+.selected {
+    background-color: #1780bf;
+}

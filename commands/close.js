@@ -1,7 +1,6 @@
 const {SlashCommandBuilder, EmbedBuilder} = require("discord.js");
 const { Guild } = require("../schemas/guild");
 const guildUtil = require("../util/guild");
-const { logChannel } = require("../config.json")
 const fs = require("fs");
 
 async function gatherEndHTML(ticketChannel, interaction) {
@@ -50,7 +49,9 @@ module.exports = {
 
         interaction.channel.delete()
 
-        if(!logChannel) {
+        const logChannel = await guildUtil.getLogChannel(interaction.guild.id);
+
+        if(logChannel === "0") {
             return;
         }
 

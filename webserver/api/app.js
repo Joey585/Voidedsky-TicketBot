@@ -7,16 +7,22 @@ const bitFieldCalculator = require("discord-bitfield-calculator");
 const {token, callback} = require("../../config.json")
 const {Guild} = require("../../schemas/guild");
 const {client} = require("../../index");
+const os = require("os");
 
 app.use(express.static(__dirname));
 
 app.get("/callback", async (req, res) => {
     const accessCode = req.query.code
+    const host = req.header("Host");
+    const protocol = req.protocol;
     if(!accessCode) {
         return;
     }
-    getAccessToken(accessCode).then((data) => {
+    getAccessToken(accessCode, host, protocol).then((data) => {
         return res.redirect(`/home.html?accessToken=${data.access_token}&tokenType=${data.token_type}`);
+    }).catch((e) => {
+        console.log(e);
+        res.send("Error in getting access_token!")
     })
 });
 
@@ -103,6 +109,13 @@ app.get("/guildChannels", async (req, res) => {
    return res.json(data);
 });
 
+app.post("/logChannel", async (req, res) => {
+   if(!req.query.channelId || !req.query.guildId) return res.send("Bad Request");
+   const result = await postLogChannel(req.query.channelId, req.query.guildId);
+
+   if(result === "Posted") return res.sendStatus(200);
+});
+
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
         headers: {
@@ -152,8 +165,8 @@ const getGuildData = (guildID) => new Promise((resolve, reject) => {
     })
 });
 
-const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
-    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=${callback}&scope=identity`;
+const getAccessToken = (accessCode, host, protocol) => new Promise((resolve, reject) => {
+    let data = `client_id=1001010197009027182&client_secret=oTvGKMA3Aa-V900Abpov_WLe9nIVAsIu&grant_type=authorization_code&code=${accessCode}&redirect_uri=${protocol}://${host}/callback&scope=identity`;
     let headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
     }
@@ -163,13 +176,20 @@ const getAccessToken = (accessCode) => new Promise((resolve, reject) => {
     }).then((r) => {
         console.log(r.data)
         resolve(r.data)
-    }).catch(() => {
+    }).catch((e) => {
+        console.log(e)
         reject("Unable to get access token!")
     })
 });
 
-const postLogChannel = (channelId) => new Promise((resolve, reject) => {
+const postLogChannel = (channelId, guildId) => new Promise((resolve, reject) => {
+    Guild.findOne({id: guildId}, async (err, guild) => {
+       if(err) reject(err);
 
+       guild.settings.logChannel = channelId;
+       await guild.save();
+       resolve("Posted");
+    });
 });
 
 

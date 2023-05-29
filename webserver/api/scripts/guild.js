@@ -188,9 +188,15 @@ function filterChannels(){
 
 }
 
-function handleChannelClick(event){
-    switch (event.target.parentNode.id){
+async function handleChannelClick(event) {
+    switch (event.target.parentNode.id) {
         case "logChannels":
-
+            console.log("Channel clicked")
+            const result = await fetch(`/logChannel?channelId=${event.target.id}&guildId=${params.get("id")}`, {method: "POST"});
+            const jsonData = await result.json();
+            console.log(jsonData);
+            if(jsonData.status === 200) {
+                event.target.className = "selected"
+            }
     }
 }

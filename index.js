@@ -4,6 +4,7 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token, mongoCLI } = require('./config.json');
 const { createTicket } = require('./buttonPress');
 const mongoose = require('mongoose');
+const {getLogChannel} = require("./util/guild");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers,] });
 

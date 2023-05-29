@@ -116,6 +116,7 @@ app.post("/logChannel", async (req, res) => {
    if(result === "Posted") return res.sendStatus(200);
 });
 
+
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
         headers: {
@@ -161,7 +162,7 @@ const getGuildData = (guildID) => new Promise((resolve, reject) => {
 
         const guildDiscord = await client.guilds.fetch(guildID);
 
-        resolve({tickets: tickets, members: guildDiscord.memberCount, messages: messages});
+        resolve({tickets: tickets, members: guildDiscord.memberCount, messages: messages, settings: guild.settings});
     })
 });
 

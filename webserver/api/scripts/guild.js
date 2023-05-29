@@ -167,8 +167,11 @@ function status(current) {
     }
 }
 
-function showChannels(){
+async function showLogChannels() {
     document.getElementById("logChannels").classList.toggle("show");
+    const guildRaw = await fetch(`/guildData?id=${params.get("id")}`)
+    const guild = await guildRaw.json();
+    document.getElementById(guild.settings.logChannel).className = "selected";
 }
 
 function filterChannels(){
@@ -193,9 +196,8 @@ async function handleChannelClick(event) {
         case "logChannels":
             console.log("Channel clicked")
             const result = await fetch(`/logChannel?channelId=${event.target.id}&guildId=${params.get("id")}`, {method: "POST"});
-            const jsonData = await result.json();
-            console.log(jsonData);
-            if(jsonData.status === 200) {
+            console.log(result)
+            if(result.status === 200){
                 event.target.className = "selected"
             }
     }

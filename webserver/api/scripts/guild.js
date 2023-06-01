@@ -102,7 +102,6 @@ fetch(`/guild?id=${params.get("id")}`)
                 for(let c = 0; c < channelList.length; c++){
                     const channelLink = document.createElement("a");
                     const dropdown = document.getElementById("logChannels");
-                    console.log(channelList[c].name)
                     channelLink.innerText = `${channelList[c].name}`;
                     channelLink.className = 'channel';
                     channelLink.id = channelList[c].id;
@@ -110,6 +109,7 @@ fetch(`/guild?id=${params.get("id")}`)
                     dropdown.appendChild(channelLink);
                 }
             });
+
 
         status("doneLoading");
     }).catch((e) => {
@@ -161,6 +161,18 @@ function status(current) {
         document.getElementById("lower-info").style.display = "block";
         document.getElementById("tickets-frame").style.display = "none";
     } else if(current === "settings"){
+        fetch(`/settings?settingName=logChannel&guildId=${params.get("id")}`)
+            .then(data => {return data.json()})
+            .then((res) => {
+                console.log(res)
+                if(res.length > 1){
+                    const channel = document.getElementById(res);
+                    console.log(channel)
+                    channel.className = "selected";
+                    console.log(channel.innerText)
+                    document.getElementById("currentLogChannel").innerText = `#${channel.innerText}`;
+                }
+            });
         document.getElementById("settings-frame").style.display = "block";
         document.getElementById("lower-info").style.display = "none";
         document.getElementById("tickets-frame").style.display = "none";
@@ -198,7 +210,17 @@ async function handleChannelClick(event) {
             const result = await fetch(`/logChannel?channelId=${event.target.id}&guildId=${params.get("id")}`, {method: "POST"});
             console.log(result)
             if(result.status === 200){
+                const selectedList = document.getElementsByClassName("selected");
+                console.log(selectedList)
+                if(selectedList.length > 0){
+                    for(let i = 0; i < selectedList.length; i++){
+                        console.log(selectedList[i])
+                        selectedList[i].className = ""
+                    }
+                }
+
                 event.target.className = "selected"
+                document.getElementById("currentLogChannel").innerText = `#${event.target.innerText}`
             }
     }
 }

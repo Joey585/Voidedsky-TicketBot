@@ -50,7 +50,7 @@
         <hr>
         <div id="allCurrentSettings">
             <div class="dropdown">
-                <button onclick="showLogChannels()" class="dropdown-button">Log Channel: <span class="discordChannel">#announcements</span></button>
+                <button onclick="showLogChannels()" class="dropdown-button">Log Channel: <span class="discordChannel" id="currentLogChannel"></span></button>
                 <div id="logChannels" class="dropdown-content">
                     <input type="text" placeholder="Channel..." id="logChannelInput" onkeyup="filterChannels()">
                 </div>

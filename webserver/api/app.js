@@ -116,6 +116,15 @@ app.post("/logChannel", async (req, res) => {
    if(result === "Posted") return res.sendStatus(200);
 });
 
+app.get("/settings", async (req, res) => {
+    if(!req.query.settingName || !req.query.guildId) return res.send("Bad Request");
+
+    const result = await getSetting(req.query.settingName, req.query.guildId);
+    if(result !== 404) res.json(result);
+    else {
+        return res.status(404);
+    }
+});
 
 const getGuilds = (accessToken) => new Promise((resolve, reject) => {
     axios.get("https://discord.com/api/users/@me/guilds", {
@@ -193,6 +202,16 @@ const postLogChannel = (channelId, guildId) => new Promise((resolve, reject) => 
     });
 });
 
+const getSetting = (settingName, guildId) => new Promise((resolve, reject) => {
+    console.log(guildId)
+    Guild.findOne({id: guildId}, async (err, guild) => {
+        if(err) reject(err);
+        const setting = new Map(Object.entries(guild.settings)).get(settingName);
+        if(!setting) return reject(404);
+
+        resolve(setting);
+    });
+});
 
 
 
